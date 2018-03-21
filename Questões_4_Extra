@@ -1,0 +1,46 @@
+
+A) f *= 5;
+mov.w R4, R11;
+add.w R4,R4;
+add.w R4,R4;
+add.w R11,R4;
+
+B) g *= 6;
+add.w R6,R6;
+mov.w R6,R11;
+add.w R6,R6;
+add.w R11,R6;
+
+D) A[2] = 6*A[1] + 5*A[0]
+mov.w 2(R9), R11;
+mov.w 0(R9), R12;
+add.w R11, R11;
+mov.w R11, R13;
+add.w R11, R11;
+add.w R13, R11; // 6*A[1] == R11
+mov.w R12, R14;
+add.w R12, R12;
+add.w R12, R12;
+add.w R14, R12; // 5*A[0] == R12
+add.w R11, R12;
+mov.w R12, 6(R9);
+
+E)A[3]= 3*f - 5*h;
+mov.w R4, R11;
+add.w R4, R4;
+add.w R11, R4; // 3*f
+mov.w R6, R12;
+add.w R6, R6;
+add.w R6, R6;
+add.w R12, R6; // 5h
+sub.w R4, R6;
+mov.w R6, 6(R9);
+
+F) A[5] = 6*(f - 2*h);
+add.w R6, R6;
+sub.w R6, R4;
+add.w R4, R4;
+mov.w R4, R11;
+add.w R4, R4;
+add.w R11, R4;
+mov.w R4, 10(R9);
