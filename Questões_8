@@ -1,0 +1,122 @@
+1. Escreva um código em C que pisca os LEDs ininterruptamente.
+
+#include <msp430g2553.h>
+#define LED1 BIT0
+#define LED2 BIT6
+#define LEDS (LED1|LED2)
+int main(void)
+{
+	WDTCTL = WDTPW | WDTHOLD;
+	P1OUT |= LEDS;
+	P1DIR |= LEDS;
+	while(1)
+	{
+		delay(1000);
+		P1OUT ^= LEDS;
+	}
+	return 0;
+}
+
+2.Escreva um código em C que pisca os LEDs ininterruptamente. No ciclo que pisca os LEDs, o tempo que os LEDs ficam ligados deve ser duas vezes maior do que o tempo que eles ficam desligados
+
+#include <msp430g2553.h>
+#define LED1 LED_RED
+#define LED2 LED_GREEN
+#define LEDS (LED1|LED2)
+
+while(1){
+int main(void)
+{
+	WDTCTL = WDTPW | WDTHOLD;
+	P1OUT |= LEDS;
+	P1DIR |= LEDS;
+	while(1)
+	{
+		delay(500);
+		P1OUTˆ=LEDS;
+		delay(1000);
+		P1OUTˆ=LEDS;
+	}
+	return 0;
+}
+}
+
+3.Escreva um código em C que acende os LEDs quando o botão é pressionado.
+
+#include <msp430g2553.h>
+#define LED1 LED_RED
+#define LED2 LED_GREEN
+#define LEDS (LED1|LED2)
+#defin BNT BIT3
+while(1){
+int main(void)
+{
+	WDTCTL = WDTPW | WDTHOLD;
+	P1OUT |= LEDS;
+	P1DIR |= LEDS;
+	P1IN = BTN;
+	while(1)
+	{
+		if ((P1IN&BTN)==0)
+			P1OUT |= LEDS;
+		else
+			P1OUT &= ˜LEDS;
+	}
+return 0;
+}
+}
+
+4. um código em C que pisca os LEDs ininterruptamente somente se o botão for pressionado.
+
+#include <msp430g2553.h>
+#define LED1 LED_RED
+#define LED2 LED_GREEN
+#define LEDS (LED1|LED2)
+#defin BNT BIT3
+while(1){
+int main(void)
+{
+	WDTCTL = WDTPW | WDTHOLD;
+	P1OUT |= LEDS;
+	P1DIR |= LEDS;
+	P1IN = BTN;
+	while(1)
+	{
+		if ((P1IN&BTN)==0){
+			while((P1IN&BTN)==0)
+			{
+				P1OUT ˆ= LEDS;
+			}
+		else
+			P1OUT &= ˜LEDS;
+		}
+	}
+return 0;
+}
+}
+
+5.Escreva um código em C que acende os LEDs quando o botão é pressionado. Deixe o MSP430 em modo de baixo consumo, e habilite a interrupção do botão.
+#include <msp430g2553.h>
+#define LED1 LED_RED
+#define LED2 LED_GREEN
+#define LEDS (LED1|LED2)
+#defin BNT BIT3
+while(1){
+int main(void)
+{
+	WDTCTL = WDTPW | WDTHOLD;
+	P1OUT |= LEDS;
+	P1DIR |= LEDS;
+	P1IN = BTN;
+	P1REN |= BTN;	//Habilita os registores de pula down no pino BTN
+	P1IES |= BTN;	// Habilita borda de descida (Deve ser habilitada antes de IE)
+	P1IE |= BTN;		//Habilita interrupção no pino BTN
+	_BIS_SR(GIE+LPM$_4_bits);
+	while((P1IN&NTN)=0)
+	{
+		P1OUT ˆ= LEDS;
+		P1IFG &=  ˜BTN;
+	}
+return 0;
+}
+}
