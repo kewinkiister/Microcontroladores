@@ -1,0 +1,22 @@
+/*
+ O codigo realiza a leitura de um sensor e tem como respota uma saida digital. 
+ O codigo foi feito para rodar no software energia para o medelo msp430g2553
+ da texas.
+ */
+
+int sensorPin = A0;    
+int DigPin = 13;      // Pino da placa
+int sensorValue = 100;  
+void setup() {
+  pinMode(DigPin, OUTPUT);  
+}
+
+void loop() {
+  sensorValue = analogRead(sensorPin);   
+ if(sensorValue >= 300){ 
+  digitalWrite(DigPin, HIGH);  
+  delay(sensorValue); }
+else  {
+  digitalWrite(DigPin, LOW);   
+  delay(sensorValue);    }              
+}
