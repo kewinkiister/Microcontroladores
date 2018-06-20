@@ -1,0 +1,191 @@
+1. Projete o hardware necessário para o MSP430 controlar um motor DC de 12V e 4A. Utilize transistores bipolares de junção (TBJ) com Vbe = 0,7 V, beta = 100 e Vce(saturação) = 0,2 V. Além disso, considere que Vcc = 3 V para o MSP430, e que este não pode fornecer mais do que 10 mA por porta digital.
+	
+	Ic = 4 A
+	Ib = Ic / beta = 4 / 100
+	Ib = 0,04 A = 40 mA  -> Maior do que a capacidade que o MSP pode oferecer
+	
+Par Darlington:
+	
+	Ib = Ic / beta^2 = 4 / 10000
+	Ib = 0,4 mA
+	Rb = (Vcc - 2Vbe)/Ib
+	Rb = (3 - 2*0,7)/0,0004 -> Rb = 4 kOhm
+
+
+2. Projete o hardware necessário para o MSP430 controlar um motor DC de 10V e 1A. Utilize transistores bipolares de junção (TBJ) com Vbe = 0,7 V e beta = 120. Além disso, considere que Vcc = 3,5 V para o MSP430, e que este não pode fornecer mais do que 10 mA por porta digital.
+
+	Ic = 1 A
+	Ib = Ic / beta = 1 / 120
+	Ib = 0,00833 A = 8,33 mA
+	Rb = (Vcc - Vbe)/Ib
+	Rb = (3,5 - 0,7)/0,00833 -> Rb = 336 Ohm 
+
+
+3. Projete o hardware utilizado para controlar 6 LEDs utilizando charlieplexing. Apresente os pinos utilizados no MSP430 e os LEDs, nomeados L1-L6.
+	Pinos MSP - Com N Pinos, controla-se N(N-1) Leds
+	
+	P1.0----------------------------
+			L3 ~L4
+	P1.1--------------------- L5 ~L6  
+		L1 ~L2
+	P1.2----------------------------
+
+	Para acender L1 -> P1.1 = 1; P1.2 = 0; P1.0 = entrada digital
+	Para acender L2 -> P1.1 = 0; P1.2 = 1; P1.0 = entrada digital
+
+	Para acender L3 -> P1.0 = 1; P1.1 = 0; P1.2 = entrada digital
+	Para acender L4 -> P1.0 = 0; P1.1 = 1; P1.2 = entrada digital
+
+	Para acender L5 -> P1.0 = 1; P1.2 = 0; P1.1 = entrada digital
+	Para acender L6 -> P1.0 = 0; P1.2 = 1; P1.1 = entrada digital
+
+4. Defina a função void main(void){} para controlar 6 LEDs de uma árvore de natal usando o hardware da questão anterior. Acenda os LEDs de forma que um ser humano veja todos acesos ao mesmo tempo.
+
+void main(void)
+
+{
+
+	while(1)
+	{
+	P1DIR |= (BIT2 + BIT1); //Define P1.1 e P1.2 como saída e P1.0 como entrada
+	P1DIR &= ~BIT0;
+	P1OUT |= BIT1;  //Acende o L1
+	P1OUT &= ~BIT2;	
+	P1OUT |= BIT2;	//Acende o L2
+	P1OUT &= ~BIT1;
+
+	P1DIR |= (BIT0 + BIT1); //Define P1.1 e P1.0 como saída e P1.2 como entrada
+	P1DIR &= ~BIT2;
+	P1OUT |= BIT0;  //Acende o L3
+	P1OUT &= ~BIT1;	
+	P1OUT |= BIT1;  //Acende o L4
+	P1OUT &= ~BIT0; 
+
+	P1DIR |= (BIT0 + BIT2); //Define P1.0 e P1.2 como saída e P1.1como entrada
+	P1DIR &= ~BIT1;
+	P1OUT |= BIT0;  //Acende o L5
+	P1OUT &= ~BIT2;	
+	P1OUT |= BIT2;  //Acende o L6
+	P1OUT &= ~BIT0; 
+	}
+	
+}
+
+5. Defina a função void main(void){} para controlar 6 LEDs de uma árvore de natal usando o hardware da questão 3. Acenda os LEDs de forma que um ser humano veja os LEDs L1 e L2 acesos juntos por um tempo, depois os LEDs L3 e L4 juntos, e depois os LEDs L5 e L6 juntos.
+
+void main(void)
+
+{
+
+	while(1)
+	{
+	P1DIR |= (BIT2 + BIT1); //Define P1.1 e P1.2 como saída e P1.0 como entrada
+	P1DIR &= ~BIT0;
+	P1OUT |= BIT1;  //Acende o L1
+	P1OUT &= ~BIT2;	
+	P1OUT |= BIT2;	//Acende o L2
+	P1OUT &= ~BIT1;
+
+	atraso(0xffff);
+
+	P1DIR |= (BIT0 + BIT1); //Define P1.1 e P1.0 como saída e P1.2 como entrada
+	P1DIR &= ~BIT2;
+	P1OUT |= BIT0;  //Acende o L3
+	P1OUT &= ~BIT1;	
+	P1OUT |= BIT1;  //Acende o L4
+	P1OUT &= ~BIT0; 
+	
+	atraso(0xffff);
+
+	P1DIR |= (BIT0 + BIT2); //Define P1.0 e P1.2 como saída e P1.1como entrada
+	P1DIR &= ~BIT1;
+	P1OUT |= BIT0;  //Acende o L5
+	P1OUT &= ~BIT2;	
+	P1OUT |= BIT2;  //Acende o L6
+	P1OUT &= ~BIT0; 
+
+	atraso(0xffff);
+	}
+	
+}
+
+6. Defina a função void EscreveDigito(volatile char dig); que escreve um dos dígitos 0x0-0xF em um único display de 7 segmentos via porta P1, baseado na figura abaixo. Considere que em outra parte do código os pinos P1.0-P1.6 já foram configurados para corresponderem aos LEDs A-G, e que estes LEDs possuem resistores externos para limitar a corrente.
+
+        ---  ==> A
+       |   |
+ F <== |   | ==> B
+       |   |
+        ---  ==> G
+       |   |
+ E <== |   | ==> C
+       |   |
+        ---  ==> D
+
+void EscreveDigito(volatile char dig)
+{
+	switch ('dig')
+	{
+	case('0'): zero();
+	break;
+	case('1'): um();
+	break;
+	case('2'): dois();
+	break;
+	case('3'): tres();
+	break;
+	.
+	.
+	.
+	case('14'): e();
+	break;
+	case('15'): f();
+	break;
+	}
+
+}
+
+void zero(void)
+{
+	P1DIR = (0x003F);
+	P1OUT = (0x003F);
+}
+
+.
+.
+.
+void f(void)
+{
+	P1DIR = (0x00F1);  //BIT1, BIT2 E BIT3 SAO ZERO: 11110001
+	P1OUT = (0x00F1);
+}
+
+7. Multiplexe 2 displays de 7 segmentos para apresentar a seguinte sequência em loop:
+	00 - 11 - 22 - 33 - 44 - 55 - 66 - 77 - 88 - 99 - AA - BB - CC - DD - EE - FF
+
+
+void main(void)
+{
+   int cont;
+   char dig;
+
+	while(1)
+	{
+	cont = 0;
+	for(cont==0; cont <= 15; cont++)
+	{
+	
+	dig = 'cont';
+	P2DIR |= (BIT6 + BIT7);   // Portas P2.6 e P2.7 são de entrada e saída digitais
+	P2OUT |= BIT6;
+	P2OUT &= ~BIT7;
+	EscreveDigito('dig');
+
+	P2DIR |= (BIT6 + BIT7);
+	P2OUT |= BIT7;
+	P2OUT &= ~BIT6;
+	EscreveDigito('dig');
+	}
+	}	
+
+
+}
